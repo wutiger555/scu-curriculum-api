@@ -11,8 +11,13 @@ api = Api(app)
 auth = HTTPBasicAuth()
 
 
+
 @auth.verify_password
 def verify(id, passwd):
+    global user_id 
+    global user_passwd 
+    user_id = id
+    user_passwd = passwd
     r = requests.post('https://web.sys.scu.edu.tw/login0.asp', data={'id':id,'passwd':passwd})
     if 'Login=ok' in r.headers['Set-Cookie']:
         return True
@@ -37,8 +42,8 @@ class getUserInfo(Resource):
 
 class getTable(Resource):
     @auth.login_required
-    def post(self, id, passwd):
-        r = requests.post('https://web.sys.scu.edu.tw/login0.asp', data={'id':id,'passwd':passwd})
+    def post(self):
+        r = requests.post('https://web.sys.scu.edu.tw/login0.asp', data={'id':user_id,'passwd':user_passwd})
         if 'Login=ok' in r.headers['Set-Cookie']:
             r.cookies.set('parselimit', 'Infinity')
             n = requests.get('https://web.sys.scu.edu.tw/SelectCar/selcar81.asp', cookies = r.cookies, data={'procsyear':'108', 'procterm':'2'})
@@ -97,7 +102,7 @@ class getTable(Resource):
 
 
 api.add_resource(getUserInfo, '/api/getUserInfo/<string:id>/<string:passwd>')
-api.add_resource(getTable, '/api/getTable/<string:id>/<string:passwd>')
+api.add_resource(getTable, '/api/getTable')
 
 if __name__ == '__main__':
     app.run(debug=True)
