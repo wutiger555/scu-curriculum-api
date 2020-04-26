@@ -12,6 +12,7 @@ bs4 = "*"
 flask-httpauth = "*"
 pandas = "*"
 requests = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"
